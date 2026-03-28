@@ -13,23 +13,15 @@ import java.util.Objects;
 @Service
 public class DirectoryWorkerServiceImpl implements DirectoryWorkerService {
 
-
-    public void createDirectory(JobConfig jobConfig) throws IOException {
-        createDirectory(jobConfig.getJobDir());
-    }
-
-    public Path buildPathWithFile(JobConfig jobConfig) {
-        return jobConfig.getJobDir().resolve(jobConfig.getFileNameWithExtension());
-    }
-
     // Private helper methods
-    private void createDirectory(Path path) throws IOException {
+    public Path createDirectory(Path path) throws IOException {
         try {
-            Files.createDirectory(path);
+            return Files.createDirectory(path);
         } catch (FileAlreadyExistsException e) {
             System.err.println("Error: A file with the same name as the directory already exists: " + e.getMessage());
         } catch (IOException e) {
             System.err.println("I/O error occurred: " + e.getMessage());
         }
+        return null;
     }
 }

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,9 +23,15 @@ public class JobConfigServiceImpl implements JobConfigService {
     private static final Logger logger = LoggerFactory.getLogger(JobConfigServiceImpl.class);
     private static final Path ROOT_DIR = Config.getDirectory();
     private static final String DEFAULT_FILE_NAME = "upload.bin";
+    private final ObjectMapper objectMapper;
 
     // Cache the jobConfigs
-    private final Map<UUID, JobConfig> jobConfigs = new ConcurrentHashMap<>();
+    private final Map<UUID, JobConfig> jobConfigsCache = new ConcurrentHashMap<>();
+
+    public JobConfigServiceImpl(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
 
     @Override
     public JobConfig createJobConfig(final MultipartFile multipartFile) throws IOException {
@@ -42,7 +49,8 @@ public class JobConfigServiceImpl implements JobConfigService {
 
         final String fileNameWithExtension = sanitizeFileName(multipartFile.getOriginalFilename());
         final JobConfig jobConfig = new JobConfig(jobId, fileNameWithExtension, jobDir);
-        jobConfigs.put(jobId, jobConfig);
+        jobConfigsCache.put(jobId, jobConfig);
+
 
         logger.info("Created job config: jobId={}, jobDir={}, fileName={}", jobId, jobDir, fileNameWithExtension);
         return jobConfig;
@@ -52,9 +60,8 @@ public class JobConfigServiceImpl implements JobConfigService {
     public JobConfig getJobConfig(final UUID jobId) {
         Objects.requireNonNull(jobId, "jobId must not be null");
 
-        final JobConfig jobConfig = jobConfigs.get(jobId);
+        final JobConfig jobConfig = jobConfigsCache.get(jobId);
         if (jobConfig == null) {
-
             throw new NoSuchElementException("No JobConfig found for jobId: " + jobId);
         }
         return jobConfig;

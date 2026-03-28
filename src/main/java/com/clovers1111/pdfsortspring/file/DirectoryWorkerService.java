@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public interface DirectoryWorkerService {
-    void createDirectory(JobConfig jobConfig) throws IOException;
+    Path createDirectory(Path path) throws IOException;
 
     public Path buildPathWithFile(JobConfig jobConfig);
 }

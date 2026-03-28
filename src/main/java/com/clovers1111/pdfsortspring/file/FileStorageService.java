@@ -12,7 +12,7 @@ import java.nio.file.Path;
 public interface FileStorageService {
 
     // Save the pddocument as a list of files written to with imageio
-    public void savePdfAsImageFiles(PDDocument pdDocument, Integer dpi) throws IOException;
+    public void savePdfAsImageFiles(final PDDocument pdDocument, Integer dpi, JobConfig jobConfig) throws IOException;
 
     public void saveMultipartFile(final MultipartFile multipartFile, JobConfig jobConfig) throws IOException;
 

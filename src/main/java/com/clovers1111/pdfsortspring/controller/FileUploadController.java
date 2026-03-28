@@ -44,7 +44,7 @@ public class FileUploadController {
      * @throws IOException
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, path = "/upload")
-    public ResponseEntity<ProcessDto> uploadFile(@RequestParam("file") @NonNull final MultipartFile file) throws IOException {
+    public ResponseEntity<JobConfig> uploadFile(@RequestParam("file") @NonNull final MultipartFile file) throws IOException {
         logger.debug("Upload request received: name={}, size={}, contentType={}",
                 file.getOriginalFilename(), file.getSize(), file.getContentType());
 
@@ -55,13 +55,12 @@ public class FileUploadController {
         logger.info("File uploaded successfully: jobId={}, file={}", jobConfig.getJobId(), jobConfig.getFileNameWithExtension());
 
 
-        // Pulls out the file to codify and send the information back to the frontend.
+        // Pulls out the file with the path (e.g., /job-directories/jobUUID/jobUUID.json)
         final Path storedFile = jobConfig.getJobDir().resolve(jobConfig.getFileNameWithExtension());
-        return ResponseEntity.ok(new ProcessDto(storedFile));
+        return ResponseEntity.ok(jobConfig);
     }
 
-    @GetMapping(path = "/process")
-    public ResponseEntity<String> processFile()
+    /*
 
     //TODO: Refactor to worth with paths
     @GetMapping(path = "/retrieve")
@@ -80,5 +79,5 @@ public class FileUploadController {
                 .contentType(MediaType.valueOf(contentType))
                 .body(body);
     }
-
+    */
 }

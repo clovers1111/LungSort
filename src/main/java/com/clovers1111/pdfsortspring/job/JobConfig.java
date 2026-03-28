@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
+
 public class JobConfig {
 
     private final UUID jobId;
@@ -22,5 +23,9 @@ public class JobConfig {
 
     }
 
+    // E.g., /root/dir/my-file.pdf
+    public Path getJobConfigPrimaryFile() {
+        return getJobDir().resolve(getFileNameWithExtension());
+    }
 
 }
