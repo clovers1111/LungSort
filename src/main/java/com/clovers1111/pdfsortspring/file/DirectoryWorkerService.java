@@ -8,6 +8,4 @@ import java.nio.file.Path;
 
 public interface DirectoryWorkerService {
     Path createDirectory(Path path) throws IOException;
-
-    public Path buildPathWithFile(JobConfig jobConfig);
 }

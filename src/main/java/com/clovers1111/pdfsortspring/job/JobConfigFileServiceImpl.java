@@ -17,7 +17,7 @@ public class JobConfigFileServiceImpl implements JobConfigFileService {
 
     // Job config folder has been created; we just need to persist the file as json
     public void saveJobConfigFile(JobConfig jobConfig) throws IOException {
-        Files.write(jobConfig.getJobDir(), jobConfigToJson(jobConfig).getBytes());
+        Files.write(jobConfig.getJobDir().resolve(jobConfig.getJobId() + ".json"), jobConfigToJson(jobConfig).getBytes());
     }
 
     public String jobConfigToJson(JobConfig jobConfig) {

@@ -1,7 +1,7 @@
 package com.clovers1111.pdfsortspring.pdf;
 
-import com.clovers1111.pdfsortspring.file.FileConversionService;
 import com.clovers1111.pdfsortspring.file.FileTypes;
+import com.clovers1111.pdfsortspring.file.utility.FileConversionService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +21,7 @@ public class PdfStorageServiceImpl implements PdfStorageService {
     private static final Logger logger = LoggerFactory.getLogger(PdfStorageServiceImpl.class);
     private static final String IMAGE_PREFIX = "temp";
 
+    //TODO: Figure out if you should make static or just refactor this class into the respective domains
     private final FileConversionService fileConversionService;
 
     public PdfStorageServiceImpl(FileConversionService fileConversionService) {

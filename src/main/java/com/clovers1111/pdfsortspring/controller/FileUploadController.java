@@ -1,7 +1,7 @@
 package com.clovers1111.pdfsortspring.controller;
 
-import com.clovers1111.pdfsortspring.file.FileConversionService;
 import com.clovers1111.pdfsortspring.file.FileStorageService;
+import com.clovers1111.pdfsortspring.file.utility.FileConversionService;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.job.JobConfigService;
 import lombok.NonNull;
@@ -22,16 +22,12 @@ public class FileUploadController {
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 
     private final FileStorageService fileStorageService;
-    private final FileConversionService fileConversionService;
     private final JobConfigService jobConfigService;
 
     public FileUploadController(
             FileStorageService fileStorageService,
-            FileConversionService fileConversionService,
-            JobConfigService jobConfigService
-    ) {
+            JobConfigService jobConfigService) {
         this.fileStorageService = fileStorageService;
-        this.fileConversionService = fileConversionService;
         this.jobConfigService = jobConfigService;
     }
 

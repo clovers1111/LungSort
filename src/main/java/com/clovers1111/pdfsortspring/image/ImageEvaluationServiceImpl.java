@@ -1,7 +1,7 @@
 package com.clovers1111.pdfsortspring.image;
 
 import com.clovers1111.pdfsortspring.Config;
-import com.clovers1111.pdfsortspring.file.FileConversionService;
+import com.clovers1111.pdfsortspring.file.utility.FileConversionService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -12,17 +12,15 @@ import org.springframework.stereotype.Service;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-@Service
+@Deprecated
 public class ImageEvaluationServiceImpl implements ImageEvaluationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ImageEvaluationService.class);
 
     private final ImageEditingService imageEditingService;
 
-    private final FileConversionService fileConversionService;
 
     private final Integer MARGIN_OF_ERROR_AS_PERCENTAGE = 95;
 
@@ -40,10 +38,8 @@ public class ImageEvaluationServiceImpl implements ImageEvaluationService {
     private final List<Integer> dpis = Config.getIntListProperty("config.dpi-list", ",");
 
 
-    public ImageEvaluationServiceImpl(ImageEditingService imageEditingService,
-                                      FileConversionService fileConversionService) {
+    public ImageEvaluationServiceImpl(ImageEditingService imageEditingService) {
         this.imageEditingService = imageEditingService;
-        this.fileConversionService = fileConversionService;
     }
 
     //TODO: fix margin of error to be more standardized
@@ -118,7 +114,7 @@ public class ImageEvaluationServiceImpl implements ImageEvaluationService {
                 Collectors.toMap(dpi -> dpi,
                         dpi -> {  // Render the page at the given dpi and return the resulting bim
                             try {
-                                return fileConversionService.pdDocumentToBimList(pdDocument, dpi).get(0); // As an individual object
+                                return FileConversionService.pdDocumentToBimList(pdDocument, dpi).get(0); // As an individual object
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
