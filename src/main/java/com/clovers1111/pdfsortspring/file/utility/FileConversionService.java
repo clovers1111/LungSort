@@ -21,24 +21,9 @@ public class FileConversionService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileConversionService.class);
 
-    public static List<BufferedImage> pdDocumentToBimList(PDDocument pageToBeRendered, Integer dpi) throws IOException {
-        final PDFRenderer pdfRenderer = new PDFRenderer(pageToBeRendered);
-        List<BufferedImage> bimList = new ArrayList<>();
-
-        for (int i = 0; i < pageToBeRendered.getNumberOfPages(); i++) {
-            bimList.add(pdfRenderer.renderImageWithDPI(i, dpi));
-        }
-        return bimList;
-    }
-
 
     public static BufferedImage fileToBim(Path path) throws IOException {
         return ImageIO.read(path.toFile());
-    }
-
-
-    public static PDDocument multipartFileToPDDocument(MultipartFile multipartFile) throws IOException {
-        return Loader.loadPDF(multipartFile.getBytes());
     }
 
 

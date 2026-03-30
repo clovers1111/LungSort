@@ -3,6 +3,7 @@ package com.clovers1111.pdfsortspring.file;
 import com.clovers1111.pdfsortspring.Config;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.job.JobConfigFileService;
+import com.clovers1111.pdfsortspring.pdf.PdfRendererService;
 import com.clovers1111.pdfsortspring.pdf.PdfStorageService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
@@ -13,6 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Path;
 
+// This is essentially a facade for interactions with JobConfig objects.
+// It deals with orchestrating all the prerequisites for the APIs we are
+// interacting with based on file types, for instance.
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
 
@@ -26,17 +30,22 @@ public class FileStorageServiceImpl implements FileStorageService {
     private final JobConfigFileService jobConfigFileService;
     private final DirectoryWorkerService directoryWorkerService;
     private final PdfStorageService pdfStorageService;
+    private final PdfRendererService pdfRendererService;
 
 
     public FileStorageServiceImpl(DirectoryWorkerService directoryWorkerService,
                                   JobConfigFileService jobConfigFileService,
-                                  PdfStorageService pdfStorageService) {
+                                  PdfStorageService pdfStorageService,
+                                  PdfRendererService pdfRendererService) {
         this.directoryWorkerService = directoryWorkerService;
         this.jobConfigFileService = jobConfigFileService;
         this.pdfStorageService = pdfStorageService;
+        this.pdfRendererService = pdfRendererService;
     }
 
-    // This is the only method that is called in the controller to persist files from the API
+    // This is the only method that is called in the controller to persist files from the API,
+    // but will likely come back to bite me for being so coupled with the creation of the
+    // JobConfig object.
     @Override
     public void saveMultipartFile(final MultipartFile multipartFile, final JobConfig jobConfig) throws IOException {
         final String contentType = multipartFile.getContentType();
@@ -58,15 +67,17 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
     }
 
+    // Called by the FileProcessorService using only the JobConfig. Again orchestration
+    // is done by this specific method to call the lower-level APIs.
     @Override
-    public void savePdfAsImageFiles(final PDDocument pdDocument, Integer dpi, JobConfig jobConfig) throws IOException {
-        final Integer targetDpi = dpi != null ? dpi : DEFAULT_DPI;
+    public void savePdfAsImageFiles(final JobConfig jobConfig) throws IOException {
+        final PDDocument pdDocument = pdfRendererService.fileToPdDocument(jobConfig.getJobConfigPrimaryFile());
+        final Integer targetDpi = DEFAULT_DPI; // change later to incorporate job config resolution for dpi
 
         logger.debug("Delegating PDF to image files for job {} to {}", jobConfig.getJobId(), jobConfig.getJobDir());
         pdfStorageService.savePdfAsImageFiles(pdDocument, targetDpi, jobConfig.getJobDir());
     }
 
-    // Coupled with jobConfig
     private void savePdfFile(MultipartFile file, JobConfig jobConfig) throws IOException {
         final Path targetPathWithFile = jobConfig.getJobConfigPrimaryFile();
 

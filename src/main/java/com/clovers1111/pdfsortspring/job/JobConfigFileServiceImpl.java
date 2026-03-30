@@ -10,6 +10,7 @@ import java.nio.file.Files;
 public class JobConfigFileServiceImpl implements JobConfigFileService {
 
     private final JobConfigService jobConfigService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public JobConfigFileServiceImpl(JobConfigService jobConfigService){
         this.jobConfigService = jobConfigService;
@@ -21,7 +22,6 @@ public class JobConfigFileServiceImpl implements JobConfigFileService {
     }
 
     public String jobConfigToJson(JobConfig jobConfig) {
-        ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(jobConfig);
     }
 }

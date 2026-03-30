@@ -1,12 +1,13 @@
 package com.clovers1111.pdfsortspring.controller;
 
+import com.clovers1111.pdfsortspring.file.FileProcessorService;
 import com.clovers1111.pdfsortspring.file.FileStorageService;
-import com.clovers1111.pdfsortspring.file.utility.FileConversionService;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.job.JobConfigService;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -23,12 +25,15 @@ public class FileUploadController {
 
     private final FileStorageService fileStorageService;
     private final JobConfigService jobConfigService;
+    private final FileProcessorService fileProcessorService;
 
     public FileUploadController(
             FileStorageService fileStorageService,
-            JobConfigService jobConfigService) {
+            JobConfigService jobConfigService,
+            FileProcessorService fileProcessorService) {
         this.fileStorageService = fileStorageService;
         this.jobConfigService = jobConfigService;
+        this.fileProcessorService = fileProcessorService;
     }
 
     /**
@@ -56,8 +61,21 @@ public class FileUploadController {
         return ResponseEntity.ok(jobConfig);
     }
 
-    /*
+    @PostMapping(path = "/process")
+    public ResponseEntity<String> processFile(@RequestParam("jobId") @NonNull final UUID jobId) throws IOException {
+        JobConfig jobConfig = jobConfigService.getJobConfig(jobId);
+        if (jobConfig == null) {
+            logger.error("JobConfig with UUID {} does not exist", jobId);
+            return null;
+        }
 
+        logger.info("Beginning to process job with jobID {}", jobId);
+        fileProcessorService.processFileIntoImages(jobConfig);
+
+        logger.info("Successfully processed job {}", jobConfig.getJobId());
+        return new ResponseEntity(HttpStatus.OK);
+    }
+    /*
     //TODO: Refactor to worth with paths
     @GetMapping(path = "/retrieve")
     public ResponseEntity<byte[]> retrieveThumbnail() throws IOException {

@@ -1,5 +1,6 @@
 package com.clovers1111.pdfsortspring.job;
 
+import com.clovers1111.pdfsortspring.file.FileTypes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -9,4 +10,6 @@ public interface JobConfigService {
     JobConfig createJobConfig(MultipartFile multipartFile) throws IOException;
 
     JobConfig getJobConfig(UUID jobId);
+
+    public FileTypes getJobConfigFileType(final JobConfig jobConfig);
 }

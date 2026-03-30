@@ -1,6 +1,8 @@
 package com.clovers1111.pdfsortspring.job;
 
 import com.clovers1111.pdfsortspring.Config;
+import com.clovers1111.pdfsortspring.file.FileTypes;
+import com.clovers1111.pdfsortspring.file.utility.FileRetrievalService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,14 +25,11 @@ public class JobConfigServiceImpl implements JobConfigService {
     private static final Logger logger = LoggerFactory.getLogger(JobConfigServiceImpl.class);
     private static final Path ROOT_DIR = Config.getDirectory();
     private static final String DEFAULT_FILE_NAME = "upload.bin";
-    private final ObjectMapper objectMapper;
 
     // Cache the jobConfigs
     private final Map<UUID, JobConfig> jobConfigsCache = new ConcurrentHashMap<>();
 
-    public JobConfigServiceImpl(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+
 
 
     @Override
@@ -41,13 +40,13 @@ public class JobConfigServiceImpl implements JobConfigService {
          * Generating a random UUID is to keep jobs separate from each other.
          * The directories take the form ROOT_DIR/UUID
          *
-         * Probability of collision is comparable to the likelihood of a
+         * Instant probability of collision is comparable to the likelihood of a
          * person being hit by a meteorite over the course of a year.
          */
         final UUID jobId = UUID.randomUUID();
         final Path jobDir = ROOT_DIR.resolve(jobId.toString());
 
-        final String fileNameWithExtension = sanitizeFileName(multipartFile.getOriginalFilename());
+        final String fileNameWithExtension = validateFileName(multipartFile.getOriginalFilename());
         final JobConfig jobConfig = new JobConfig(jobId, fileNameWithExtension, jobDir);
         jobConfigsCache.put(jobId, jobConfig);
 
@@ -69,7 +68,15 @@ public class JobConfigServiceImpl implements JobConfigService {
         return jobConfig;
     }
 
-    private String sanitizeFileName(final String originalFileName) {
+    public FileTypes getJobConfigFileType(final JobConfig jobConfig) {
+        return FileTypes.fromExtension(FileRetrievalService
+                .getFileExtension(Path.of(jobConfig
+                        .getFileNameWithExtension())))
+                .orElseThrow(/*some exception*/);
+
+    }
+
+    private String validateFileName(final String originalFileName) {
         if (originalFileName == null || originalFileName.isBlank()) {
             return DEFAULT_FILE_NAME;
         }

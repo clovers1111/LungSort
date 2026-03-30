@@ -2,6 +2,7 @@ package com.clovers1111.pdfsortspring.image;
 
 import com.clovers1111.pdfsortspring.Config;
 import com.clovers1111.pdfsortspring.file.utility.FileConversionService;
+import com.clovers1111.pdfsortspring.pdf.PdfRendererService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -21,6 +22,8 @@ public class ImageEvaluationServiceImpl implements ImageEvaluationService {
 
     private final ImageEditingService imageEditingService;
 
+    private final PdfRendererService pdfRendererService;
+
 
     private final Integer MARGIN_OF_ERROR_AS_PERCENTAGE = 95;
 
@@ -38,8 +41,10 @@ public class ImageEvaluationServiceImpl implements ImageEvaluationService {
     private final List<Integer> dpis = Config.getIntListProperty("config.dpi-list", ",");
 
 
-    public ImageEvaluationServiceImpl(ImageEditingService imageEditingService) {
+    public ImageEvaluationServiceImpl(ImageEditingService imageEditingService,
+                                      PdfRendererService pdfRendererService) {
         this.imageEditingService = imageEditingService;
+        this.pdfRendererService = pdfRendererService;
     }
 
     //TODO: fix margin of error to be more standardized
@@ -114,7 +119,7 @@ public class ImageEvaluationServiceImpl implements ImageEvaluationService {
                 Collectors.toMap(dpi -> dpi,
                         dpi -> {  // Render the page at the given dpi and return the resulting bim
                             try {
-                                return FileConversionService.pdDocumentToBimList(pdDocument, dpi).get(0); // As an individual object
+                                return pdfRendererService.pdDocumentToBimList(pdDocument, dpi).get(0); // As an individual object
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }

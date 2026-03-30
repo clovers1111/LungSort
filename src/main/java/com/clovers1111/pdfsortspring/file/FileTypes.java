@@ -21,6 +21,10 @@ public enum FileTypes {
         return extension;
     }
 
+    public String getExtensionWithoutDot() {
+        return extension.replace(".", "");
+    }
+
     public String getMimeType() {
         return mimeType;
     }
