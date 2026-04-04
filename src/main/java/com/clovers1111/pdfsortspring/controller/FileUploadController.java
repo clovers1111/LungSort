@@ -1,6 +1,8 @@
 package com.clovers1111.pdfsortspring.controller;
 
+import com.clovers1111.pdfsortspring.Config;
 import com.clovers1111.pdfsortspring.file.FileOrchestratorService;
+import com.clovers1111.pdfsortspring.file.FileRetrievalFacade;
 import com.clovers1111.pdfsortspring.file.FileStorageFacade;
 import com.clovers1111.pdfsortspring.file.utility.FileRetrievalService;
 import com.clovers1111.pdfsortspring.job.JobConfig;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -24,19 +27,22 @@ public class FileUploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 
-    private static final Integer NUMBER_OF_FILES = 5;
+    private static final Integer NUMBER_OF_FILES = Config.getIntProperty("default-file-retrieval-number");
 
     private final FileStorageFacade fileStorageFacade;
     private final JobConfigService jobConfigService;
     private final FileOrchestratorService fileOrchestratorService;
+    private final FileRetrievalFacade fileRetrievalFacade;
 
     public FileUploadController(
             FileStorageFacade fileStorageFacade,
             JobConfigService jobConfigService,
-            FileOrchestratorService fileOrchestratorService) {
+            FileOrchestratorService fileOrchestratorService,
+            FileRetrievalFacade fileRetrievalFacade) {
         this.fileStorageFacade = fileStorageFacade;
         this.jobConfigService = jobConfigService;
         this.fileOrchestratorService = fileOrchestratorService;
+        this.fileRetrievalFacade = fileRetrievalFacade;
     }
 
     /**
@@ -65,7 +71,7 @@ public class FileUploadController {
     }
 
     @PostMapping(path = "/process")
-    public ResponseEntity<String> processFile(@RequestParam("jobId") @NonNull final UUID jobId) throws IOException {
+    public ResponseEntity<ImageProcessResponseDto> processFile(@RequestParam("jobId") @NonNull final UUID jobId) throws IOException {
         JobConfig jobConfig = jobConfigService.getJobConfig(jobId);
         if (jobConfig == null) {
             //resolve job config/recreate cache
@@ -75,15 +81,16 @@ public class FileUploadController {
 
         logger.info("Beginning to process job with jobID {}", jobId);
         fileOrchestratorService.processFileIntoImages(jobConfig);
+        logger.info("Successfully persisted job {}", jobConfig.getJobId());
 
-        logger.info("Successfully processed job {}", jobConfig.getJobId());
-        return new ResponseEntity(HttpStatus.OK);
+        // Get image files for user to request later; we'll do this now to make frontend retrieval more seamless.
+        final Set<Path> imageFilePaths = fileRetrievalFacade.retrieveImageFiles(jobConfig, NUMBER_OF_FILES);
+
+        final ImageProcessResponseDto response = new ImageProcessResponseDto(imageFilePaths, jobConfig.getJobId());
+
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping(path = "/retrieve")
-    public ResponseEntity<byte[]> retrieveImageFile(@RequestParam("jobId") @NonNull final UUID jobId) {
-
-    }
     /*
     //TODO: Refactor to worth with paths
     @GetMapping(path = "/retrieve")

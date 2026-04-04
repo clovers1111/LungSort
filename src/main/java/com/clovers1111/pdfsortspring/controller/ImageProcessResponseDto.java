@@ -3,12 +3,13 @@ package com.clovers1111.pdfsortspring.controller;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class ImageProcessResponseDto {
     private Set<Path> imagePaths;
-    private String jobId;
+    private UUID jobId;
 
-    public ImageProcessResponseDto(Set<Path> imagePaths, String jobId) {
+    public ImageProcessResponseDto(Set<Path> imagePaths, UUID jobId) {
         this.imagePaths = imagePaths;
         this.jobId = jobId;
     }
@@ -18,7 +19,7 @@ public class ImageProcessResponseDto {
         return imagePaths;
     }
 
-    public String getJobId() {
+    public UUID getJobId() {
         return jobId;
     }
 }
