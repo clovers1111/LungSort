@@ -18,9 +18,9 @@ import java.nio.file.Path;
 // It deals with orchestrating all the prerequisites for the APIs we are
 // interacting with based on file types, for instance.
 @Service
-public class FileStorageServiceImpl implements FileStorageService {
+public class FileStorageFacadeImpl implements FileStorageFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileStorageServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileStorageFacadeImpl.class);
 
     private static final Path ROOT_DIR = Config.getDirectory();
 
@@ -33,10 +33,10 @@ public class FileStorageServiceImpl implements FileStorageService {
     private final PdfRendererService pdfRendererService;
 
 
-    public FileStorageServiceImpl(DirectoryWorkerService directoryWorkerService,
-                                  JobConfigFileService jobConfigFileService,
-                                  PdfStorageService pdfStorageService,
-                                  PdfRendererService pdfRendererService) {
+    public FileStorageFacadeImpl(DirectoryWorkerService directoryWorkerService,
+                                 JobConfigFileService jobConfigFileService,
+                                 PdfStorageService pdfStorageService,
+                                 PdfRendererService pdfRendererService) {
         this.directoryWorkerService = directoryWorkerService;
         this.jobConfigFileService = jobConfigFileService;
         this.pdfStorageService = pdfStorageService;
@@ -67,15 +67,16 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
     }
 
-    // Called by the FileProcessorService using only the JobConfig. Again orchestration
+    // Called by the FileOrchestratorService using only the JobConfig. Again orchestration
     // is done by this specific method to call the lower-level APIs.
     @Override
     public void savePdfAsImageFiles(final JobConfig jobConfig) throws IOException {
         final PDDocument pdDocument = pdfRendererService.fileToPdDocument(jobConfig.getJobConfigPrimaryFile());
         final Integer targetDpi = DEFAULT_DPI; // change later to incorporate job config resolution for dpi
+        final FileTypes type = jobConfigFileService.getJobConfigFileType(jobConfig);
 
         logger.debug("Delegating PDF to image files for job {} to {}", jobConfig.getJobId(), jobConfig.getJobDir());
-        pdfStorageService.savePdfAsImageFiles(pdDocument, targetDpi, jobConfig.getJobDir());
+        pdfStorageService.savePdfAsImageFiles(pdDocument, targetDpi, jobConfig.getJobDir(), type);
     }
 
     private void savePdfFile(MultipartFile file, JobConfig jobConfig) throws IOException {

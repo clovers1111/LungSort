@@ -1,5 +1,6 @@
 package com.clovers1111.pdfsortspring.pdf;
 
+import com.clovers1111.pdfsortspring.Config;
 import com.clovers1111.pdfsortspring.file.FileTypes;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import java.util.stream.IntStream;
 public class PdfStorageServiceImpl implements PdfStorageService {
 
     private static final Logger logger = LoggerFactory.getLogger(PdfStorageServiceImpl.class);
-    private static final String IMAGE_PREFIX = "temp";
+    private static final String IMAGE_PREFIX = Config.getProperty("image-prefix");
 
     //TODO: Figure out if you should make static or just refactor this class into the respective domains
     private final PdfRendererService pdfRendererService;
@@ -37,13 +38,13 @@ public class PdfStorageServiceImpl implements PdfStorageService {
     }
 
     @Override
-    public void savePdfAsImageFiles(final PDDocument pdDocument, final Integer dpi, final Path outputDir) throws IOException {
+    public void savePdfAsImageFiles(final PDDocument pdDocument, final Integer dpi, final Path outputDir, final FileTypes type) throws IOException {
         final List<BufferedImage> bimList = pdfRendererService.pdDocumentToBimList(pdDocument, dpi);
         logger.info("Rendering {} pages at {} DPI to {}", bimList.size(), dpi, outputDir);
 
         IntStream.range(0, bimList.size())
-                .forEach(i -> {
-                    final Path output = outputDir.resolve(IMAGE_PREFIX + i + FileTypes.PNG.getExtension());
+                .forEach(i -> { // Needs to be a sequential naming scheme
+                    final Path output = outputDir.resolve(IMAGE_PREFIX + i + type.getExtension());
                     try {
                         final boolean write = ImageIO.write(bimList.get(i), FileTypes.PNG.getExtensionWithoutDot(), output.toFile());
                         if (!write)

@@ -1,10 +1,13 @@
 package com.clovers1111.pdfsortspring.job;
 
+import com.clovers1111.pdfsortspring.file.FileTypes;
+import com.clovers1111.pdfsortspring.file.utility.FileRetrievalService;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Service
 public class JobConfigFileServiceImpl implements JobConfigFileService {
@@ -24,4 +27,12 @@ public class JobConfigFileServiceImpl implements JobConfigFileService {
     public String jobConfigToJson(JobConfig jobConfig) {
         return objectMapper.writeValueAsString(jobConfig);
     }
+
+    public FileTypes getJobConfigFileType(final JobConfig jobConfig) {
+        return FileTypes.fromExtension(FileRetrievalService
+                        .getFileExtension(Path.of(jobConfig
+                                .getFileNameWithExtension())))
+                .orElseThrow(/*some exception*/);
+    }
+
 }

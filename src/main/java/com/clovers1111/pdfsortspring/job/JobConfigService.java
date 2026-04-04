@@ -10,6 +10,4 @@ public interface JobConfigService {
     JobConfig createJobConfig(MultipartFile multipartFile) throws IOException;
 
     JobConfig getJobConfig(UUID jobId);
-
-    public FileTypes getJobConfigFileType(final JobConfig jobConfig);
 }

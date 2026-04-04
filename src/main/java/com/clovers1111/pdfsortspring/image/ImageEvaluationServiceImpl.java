@@ -1,14 +1,12 @@
 package com.clovers1111.pdfsortspring.image;
 
 import com.clovers1111.pdfsortspring.Config;
-import com.clovers1111.pdfsortspring.file.utility.FileConversionService;
 import com.clovers1111.pdfsortspring.pdf.PdfRendererService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

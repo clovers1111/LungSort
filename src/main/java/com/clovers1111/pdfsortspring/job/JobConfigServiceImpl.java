@@ -68,14 +68,6 @@ public class JobConfigServiceImpl implements JobConfigService {
         return jobConfig;
     }
 
-    public FileTypes getJobConfigFileType(final JobConfig jobConfig) {
-        return FileTypes.fromExtension(FileRetrievalService
-                .getFileExtension(Path.of(jobConfig
-                        .getFileNameWithExtension())))
-                .orElseThrow(/*some exception*/);
-
-    }
-
     private String validateFileName(final String originalFileName) {
         if (originalFileName == null || originalFileName.isBlank()) {
             return DEFAULT_FILE_NAME;

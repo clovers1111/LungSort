@@ -1,7 +1,8 @@
 package com.clovers1111.pdfsortspring.controller;
 
-import com.clovers1111.pdfsortspring.file.FileProcessorService;
-import com.clovers1111.pdfsortspring.file.FileStorageService;
+import com.clovers1111.pdfsortspring.file.FileOrchestratorService;
+import com.clovers1111.pdfsortspring.file.FileStorageFacade;
+import com.clovers1111.pdfsortspring.file.utility.FileRetrievalService;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.job.JobConfigService;
 import lombok.NonNull;
@@ -23,17 +24,19 @@ public class FileUploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 
-    private final FileStorageService fileStorageService;
+    private static final Integer NUMBER_OF_FILES = 5;
+
+    private final FileStorageFacade fileStorageFacade;
     private final JobConfigService jobConfigService;
-    private final FileProcessorService fileProcessorService;
+    private final FileOrchestratorService fileOrchestratorService;
 
     public FileUploadController(
-            FileStorageService fileStorageService,
+            FileStorageFacade fileStorageFacade,
             JobConfigService jobConfigService,
-            FileProcessorService fileProcessorService) {
-        this.fileStorageService = fileStorageService;
+            FileOrchestratorService fileOrchestratorService) {
+        this.fileStorageFacade = fileStorageFacade;
         this.jobConfigService = jobConfigService;
-        this.fileProcessorService = fileProcessorService;
+        this.fileOrchestratorService = fileOrchestratorService;
     }
 
     /**
@@ -52,7 +55,7 @@ public class FileUploadController {
         // Create our JobConfig
         // All persistence operations NEED to go through the JobConfig object avoid inconsistent writes/reads.
         final JobConfig jobConfig = jobConfigService.createJobConfig(file);
-        fileStorageService.saveMultipartFile(file, jobConfig);
+        fileStorageFacade.saveMultipartFile(file, jobConfig);
         logger.info("File uploaded successfully: jobId={}, file={}", jobConfig.getJobId(), jobConfig.getFileNameWithExtension());
 
 
@@ -65,15 +68,21 @@ public class FileUploadController {
     public ResponseEntity<String> processFile(@RequestParam("jobId") @NonNull final UUID jobId) throws IOException {
         JobConfig jobConfig = jobConfigService.getJobConfig(jobId);
         if (jobConfig == null) {
+            //resolve job config/recreate cache
             logger.error("JobConfig with UUID {} does not exist", jobId);
             return null;
         }
 
         logger.info("Beginning to process job with jobID {}", jobId);
-        fileProcessorService.processFileIntoImages(jobConfig);
+        fileOrchestratorService.processFileIntoImages(jobConfig);
 
         logger.info("Successfully processed job {}", jobConfig.getJobId());
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/retrieve")
+    public ResponseEntity<byte[]> retrieveImageFile(@RequestParam("jobId") @NonNull final UUID jobId) {
+
     }
     /*
     //TODO: Refactor to worth with paths
@@ -81,11 +90,11 @@ public class FileUploadController {
     public ResponseEntity<byte[]> retrieveThumbnail() throws IOException {
         logger.debug("Thumbnail retrieval request received");
 
-        final Path imgFile = fileStorageService.getRandomImageFile();
+        final Path imgFile = fileStorageFacade.getRandomImageFile();
         logger.debug("Selected image file for thumbnail: {}", imgFile.getName());
 
         final byte[] body = fileConversionService.fileToByteArray(imgFile);
-        final String contentType = FileStorageService.getContentType(imgFile);
+        final String contentType = FileStorageFacade.getContentType(imgFile);
         logger.info("Returning thumbnail: file={}, contentType={}, size={} bytes",
                 imgFile.getName(), contentType, body.length);
 

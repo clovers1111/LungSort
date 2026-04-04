@@ -55,6 +55,19 @@ public final class FileRetrievalService {
         }
     }
 
+    public static List<Path> listImageFiles(final Path directory) {
+        validateDirectory(directory);
+
+        try (Stream<Path> paths = Files.list(directory)) {
+            return paths
+                    .filter(Files::isRegularFile)
+                    .filter(path -> isImageFile(path))
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // Returns the file extension (with the dot included)
     public static String getFileExtension(final Path path) {
         final Path fileNamePath = path.getFileName();

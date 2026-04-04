@@ -14,6 +14,7 @@ public class JobConfig {
     private final UUID jobId;
     private final String fileNameWithExtension;
     private final Path jobDir;
+
     private final Instant date = Instant.now();
     //private final byte[] thumbnail;
 
