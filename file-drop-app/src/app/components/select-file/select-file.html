@@ -1,0 +1,12 @@
+<main>
+    <div class="file-container">
+        @for (job of jobs; track job.jobId) {
+            <app-job-card [job]="job" (jobClicked)="onJobClicked($event)" />
+        } @empty {
+            <p>No files uploaded yet.</p>
+        }
+    </div>
+    <div class="clear-container">
+        <button class="clear-btn" (click)="clearJobs()">Clear Jobs</button>
+    </div>
+</main>

@@ -1,0 +1,16 @@
+nav a {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 2px solid #00416A;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+  color: white;
+  background-color: #00416A;
+  text-decoration: none;
+  margin-right: 8px;
+}
+
+nav a:hover {
+  background-color: transparent;
+  color: #00416A;
+}

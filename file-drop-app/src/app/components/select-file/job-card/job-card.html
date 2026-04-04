@@ -1,0 +1,11 @@
+<div class="file-card">
+    <div class="thumbnail">
+        <button class="select-btn" (click)="jobClicked.emit(job.jobId)">Process</button>
+    </div>
+    <div class="file-info">
+        <p class="job-id">{{ job.fileNameWithExtension }}</p>
+        <p>{{ job.date }}</p>
+        <p>{{ job.jobId }}</p>
+        <p>{{ job.status }}</p>
+    </div>
+</div>

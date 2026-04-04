@@ -1,0 +1,28 @@
+<div
+  class="drop-zone"
+  [class.hover]="isHovering"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  <p>📂 Drag & drop files here</p>
+</div>
+<div class="upload-section">
+    @if (uploadAttempt) {
+    <div> {{uploadPercentage}} </div>
+  <div> {{responseMessage}} </div>
+  }
+</div>
+  <div class="file-list">
+    <h3>Files:</h3>
+    <ul>
+      <li *ngFor="let file of files">
+        {{ file.name }} ({{ file.size | number }} bytes)
+      </li>
+    </ul>
+    <div class="upload-button">
+      <button (click)="onUpload()"> Upload </button>
+    </div>
+  </div>
+
+
