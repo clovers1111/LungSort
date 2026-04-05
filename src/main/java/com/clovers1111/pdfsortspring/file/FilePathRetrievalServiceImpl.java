@@ -1,6 +1,7 @@
 package com.clovers1111.pdfsortspring.file;
 
-import com.clovers1111.pdfsortspring.file.utility.FileRetrievalService;
+import com.clovers1111.pdfsortspring.file.utility.FileRetrievalHelper;
+import com.clovers1111.pdfsortspring.image.utility.ImageRetrievalHelper;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,16 +9,17 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class FileRetrievalFacadeImpl implements FileRetrievalFacade {
+public class FilePathRetrievalServiceImpl implements FilePathRetrievalService {
 
-    final static Logger logger = LoggerFactory.getLogger(FileRetrievalFacadeImpl.class);
+    final static Logger logger = LoggerFactory.getLogger(FilePathRetrievalServiceImpl.class);
 
     // Keep track of the job config and corresponding paths of image files
-    private final static Map<JobConfig, Stack<Path>> cache = new HashMap<>();
+    private final static Map<JobConfig, Stack<Path>> cache = new ConcurrentHashMap<>();
 
     @Override
     public Set<Path> retrieveImageFiles(final JobConfig jobConfig, final Integer numOfFiles) {
@@ -48,7 +50,7 @@ public class FileRetrievalFacadeImpl implements FileRetrievalFacade {
     private Stack<Path> getCache(JobConfig jobConfig) {
         if (!cache.containsKey(jobConfig)) {
             logger.info("Caching job {}", jobConfig.getJobId());
-            final Stack<Path> pathStack = Stream.of(FileRetrievalService.listImageFiles(
+            final Stack<Path> pathStack = Stream.of(ImageRetrievalHelper.listImageFiles(
                             jobConfig.getJobDir()))
                     .peek(Collections::shuffle)
                     .flatMap(List::stream)

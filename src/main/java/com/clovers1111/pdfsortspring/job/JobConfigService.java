@@ -9,5 +9,5 @@ import java.util.UUID;
 public interface JobConfigService {
     JobConfig createJobConfig(MultipartFile multipartFile) throws IOException;
 
-    JobConfig getJobConfig(UUID jobId);
+    JobConfig getJobConfig(UUID jobId) throws IOException;
 }

@@ -7,7 +7,8 @@ public enum FileTypes {
     PDF(".pdf", "application/pdf"),
     PNG(".png", "image/png"),
     JPG(".jpg", "image/jpeg"),
-    JPEG(".jpeg", "image/jpeg");
+    JPEG(".jpeg", "image/jpeg"),
+    JSON(".json", "application/json");
 
     private final String extension;
     private final String mimeType;

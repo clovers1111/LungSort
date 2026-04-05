@@ -2,15 +2,13 @@ package com.clovers1111.pdfsortspring.controller;
 
 import com.clovers1111.pdfsortspring.Config;
 import com.clovers1111.pdfsortspring.file.FileOrchestratorService;
-import com.clovers1111.pdfsortspring.file.FileRetrievalFacade;
+import com.clovers1111.pdfsortspring.file.FilePathRetrievalService;
 import com.clovers1111.pdfsortspring.file.FileStorageFacade;
-import com.clovers1111.pdfsortspring.file.utility.FileRetrievalService;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.job.JobConfigService;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,17 +30,17 @@ public class FileUploadController {
     private final FileStorageFacade fileStorageFacade;
     private final JobConfigService jobConfigService;
     private final FileOrchestratorService fileOrchestratorService;
-    private final FileRetrievalFacade fileRetrievalFacade;
+    private final FilePathRetrievalService filePathRetrievalService;
 
     public FileUploadController(
             FileStorageFacade fileStorageFacade,
             JobConfigService jobConfigService,
             FileOrchestratorService fileOrchestratorService,
-            FileRetrievalFacade fileRetrievalFacade) {
+            FilePathRetrievalService filePathRetrievalService) {
         this.fileStorageFacade = fileStorageFacade;
         this.jobConfigService = jobConfigService;
         this.fileOrchestratorService = fileOrchestratorService;
-        this.fileRetrievalFacade = fileRetrievalFacade;
+        this.filePathRetrievalService = filePathRetrievalService;
     }
 
     /**
@@ -84,7 +82,7 @@ public class FileUploadController {
         logger.info("Successfully persisted job {}", jobConfig.getJobId());
 
         // Get image files for user to request later; we'll do this now to make frontend retrieval more seamless.
-        final Set<Path> imageFilePaths = fileRetrievalFacade.retrieveImageFiles(jobConfig, NUMBER_OF_FILES);
+        final Set<Path> imageFilePaths = filePathRetrievalService.retrieveImageFiles(jobConfig, NUMBER_OF_FILES);
 
         final ImageProcessResponseDto response = new ImageProcessResponseDto(imageFilePaths, jobConfig.getJobId());
 

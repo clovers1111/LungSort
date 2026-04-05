@@ -1,6 +1,7 @@
 package com.clovers1111.pdfsortspring.file;
 
 import com.clovers1111.pdfsortspring.Config;
+import com.clovers1111.pdfsortspring.file.utility.DirectoryHelper;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.job.JobConfigFileService;
 import com.clovers1111.pdfsortspring.pdf.PdfRendererService;
@@ -28,16 +29,13 @@ public class FileStorageFacadeImpl implements FileStorageFacade {
     private static final Integer DEFAULT_DPI = Config.getIntProperty("default-dpi");
 
     private final JobConfigFileService jobConfigFileService;
-    private final DirectoryWorkerService directoryWorkerService;
     private final PdfStorageService pdfStorageService;
     private final PdfRendererService pdfRendererService;
 
 
-    public FileStorageFacadeImpl(DirectoryWorkerService directoryWorkerService,
-                                 JobConfigFileService jobConfigFileService,
+    public FileStorageFacadeImpl(JobConfigFileService jobConfigFileService,
                                  PdfStorageService pdfStorageService,
                                  PdfRendererService pdfRendererService) {
-        this.directoryWorkerService = directoryWorkerService;
         this.jobConfigFileService = jobConfigFileService;
         this.pdfStorageService = pdfStorageService;
         this.pdfRendererService = pdfRendererService;
@@ -57,7 +55,7 @@ public class FileStorageFacadeImpl implements FileStorageFacade {
                     return new IllegalArgumentException("Unsupported file type: " + contentType);
                 });
 
-        directoryWorkerService.createDirectory(jobConfig.getJobDir());
+        DirectoryHelper.createDirectory(jobConfig.getJobDir());
         jobConfigFileService.saveJobConfigFile(jobConfig);
 
         logger.info("Saving file of type {} for job {}", fileType, jobConfig.getJobId());

@@ -1,9 +1,8 @@
 package com.clovers1111.pdfsortspring.controller;
 
 import com.clovers1111.pdfsortspring.Config;
-import com.clovers1111.pdfsortspring.file.FileRetrievalFacade;
+import com.clovers1111.pdfsortspring.file.FilePathRetrievalService;
 import com.clovers1111.pdfsortspring.image.ImageProcessorService;
-import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.job.JobConfigService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Set;
 import java.util.UUID;
 
 
@@ -44,7 +42,7 @@ public class SortProcedureController {
 
     public final JobConfigService jobConfigService;
 
-    public final FileRetrievalFacade fileRetrievalFacade;
+    public final FilePathRetrievalService fileRetrievalFacade;
 
 
 

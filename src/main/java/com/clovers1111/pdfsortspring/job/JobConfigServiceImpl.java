@@ -1,16 +1,16 @@
 package com.clovers1111.pdfsortspring.job;
 
 import com.clovers1111.pdfsortspring.Config;
-import com.clovers1111.pdfsortspring.file.FileTypes;
-import com.clovers1111.pdfsortspring.file.utility.FileRetrievalService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Map;
@@ -20,15 +20,19 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@RequiredArgsConstructor
 public class JobConfigServiceImpl implements JobConfigService {
 
     private static final Logger logger = LoggerFactory.getLogger(JobConfigServiceImpl.class);
     private static final Path ROOT_DIR = Config.getDirectory();
     private static final String DEFAULT_FILE_NAME = "upload.bin";
 
+    private final JobConfigFileService jobConfigFileService;
+
     // Cache the jobConfigs
     private final Map<UUID, JobConfig> jobConfigsCache = new ConcurrentHashMap<>();
 
+    private final ObjectMapper objectMapper;
 
 
 
@@ -56,15 +60,29 @@ public class JobConfigServiceImpl implements JobConfigService {
     }
 
     @Override
-    public JobConfig getJobConfig(final UUID jobId) {
+    public JobConfig getJobConfig(final UUID jobId) throws IOException {
         Objects.requireNonNull(jobId, "jobId must not be null");
 
-        final JobConfig jobConfig = jobConfigsCache.get(jobId);
-        if (jobConfig == null) {
-            //TODO: Add file searching for json
 
-            throw new NoSuchElementException("No JobConfig found for jobId: " + jobId);
+        if (!jobConfigsCache.containsKey(jobId)) { // try to find jobConfig
+            logger.warn("JobConfig {} wasn't found in cache. Attempting to resolve . . .", jobId);
+            final Path jobConfigPath = jobConfigFileService.buildJobConfigPath(ROOT_DIR, jobId);
+            // jobConfigPath shouldn't ever be null since we pass the root directory in.
+            if (jobConfigPath == null || !jobConfigPath.toFile().exists()) {
+                throw new NoSuchElementException("No JobConfig found for jobId: " + jobId);
+            } else if (!jobConfigPath.toFile().canRead()) {
+                throw new IOException("Cannot read" + jobConfigPath);
+            }
+
+            try {
+                jobConfigsCache.put(jobId,
+                        objectMapper.readValue(jobConfigPath, JobConfig.class));
+            } catch (JacksonException e) {
+                throw new RuntimeException(e);
+            }
         }
+
+        final JobConfig jobConfig = jobConfigsCache.get(jobId);
         return jobConfig;
     }
 

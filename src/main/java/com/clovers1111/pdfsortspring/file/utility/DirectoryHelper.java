@@ -1,20 +1,15 @@
-package com.clovers1111.pdfsortspring.file;
+package com.clovers1111.pdfsortspring.file.utility;
 
-import com.clovers1111.pdfsortspring.job.JobConfig;
-import org.springframework.stereotype.Service;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
-@Service
-public class DirectoryWorkerServiceImpl implements DirectoryWorkerService {
+
+public class DirectoryHelper {
 
     // Private helper methods
-    public Path createDirectory(Path path) throws IOException {
+    public static Path createDirectory(Path path) throws IOException {
         try {
             return Files.createDirectory(path);
         } catch (FileAlreadyExistsException e) {
