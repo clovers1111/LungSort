@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Deprecated
+@Deprecated(forRemoval = true)
 public class ImageEvaluationServiceImpl implements ImageEvaluationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ImageEvaluationService.class);
@@ -106,7 +106,7 @@ public class ImageEvaluationServiceImpl implements ImageEvaluationService {
         try {
             evalPage.setCropBox(sectionOfInterest);
         } catch (Exception e) {
-            logger.error("Selected page wasn't large enough to accommodate {}", STR."\{SAMPLE_WIDTH}x\{SAMPLE_HEIGHT}");
+            logger.error("Selected page wasn't large enough to accommodate {}", SAMPLE_WIDTH + "x" + SAMPLE_HEIGHT);
         }
 
         // Add the page to the document for it to be rendered later

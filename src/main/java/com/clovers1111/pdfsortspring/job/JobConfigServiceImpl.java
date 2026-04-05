@@ -63,7 +63,7 @@ public class JobConfigServiceImpl implements JobConfigService {
     public JobConfig getJobConfig(final UUID jobId) throws IOException {
         Objects.requireNonNull(jobId, "jobId must not be null");
 
-
+        // TODO: Missing instance where jobConfig is null
         if (!jobConfigsCache.containsKey(jobId)) { // try to find jobConfig
             logger.warn("JobConfig {} wasn't found in cache. Attempting to resolve . . .", jobId);
             final Path jobConfigPath = jobConfigFileService.buildJobConfigPath(ROOT_DIR, jobId);

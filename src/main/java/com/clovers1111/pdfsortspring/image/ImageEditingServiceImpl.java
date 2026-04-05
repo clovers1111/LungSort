@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 @Service
-@Deprecated
+@Deprecated(forRemoval = true)
 public class ImageEditingServiceImpl implements ImageEditingService {
     public void laplaceTransform(BufferedImage bim, int[][] kernel) {
         // Iterate over all the necessary pixels in our image

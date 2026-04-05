@@ -38,14 +38,27 @@ public class SortProcedureController {
 
     private static final Logger logger = LoggerFactory.getLogger(SortProcedureController.class);
 
-    public static final Integer NUMBER_OF_FILES = Config.getIntProperty("default-file-retrieval-number");
-
     public final JobConfigService jobConfigService;
 
     public final FilePathRetrievalService fileRetrievalFacade;
 
 
-
+    /**
+     * Return a byte array for the corresponding file path
+     *
+     * <p>
+     *     Receives an HTTPs payload with a UUID for the job and a path
+     *     for the image that we expect to process. This is done piecemeal
+     *     to allow for multiple files to be processed at once at the
+     *     behest of the requesting API (frontend).
+     * </p>
+     *
+     *
+     * @param jobId for the job that we're working on
+     * @param imagePath for the path of the image we're returning
+     * @return a response containing an image
+     * @throws IOException if something explodes
+     */
     @GetMapping(path = "/retrieve")
     public ResponseEntity<byte[]> retrieveImageFile(@RequestParam("jobId") @NonNull final UUID jobId,
                                                     @RequestBody @NonNull final Path imagePath) throws IOException {
