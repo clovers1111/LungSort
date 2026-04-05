@@ -50,13 +50,15 @@ public class FilePathRetrievalServiceImpl implements FilePathRetrievalService {
     private Stack<Path> getCache(JobConfig jobConfig) {
         if (!cache.containsKey(jobConfig)) {
             logger.info("Caching job {}", jobConfig.getJobId());
-            final Stack<Path> pathStack = Stream.of(ImageRetrievalHelper.listImageFiles(
-                            jobConfig.getJobDir()))
-                    .peek(Collections::shuffle)
-                    .flatMap(List::stream)
+            List<Path> fileList = new ArrayList(ImageRetrievalHelper.listImageFiles(
+                    jobConfig.getJobDir()));
+            Collections.shuffle(fileList);
+
+            final Stack<Path> pathStack = fileList.stream()
                     .collect(Collectors.toCollection(Stack::new));
 
             cache.put(jobConfig, pathStack);
+            logger.info("Finished caching job {}", jobConfig.getJobId());
         }
 
         return cache.get(jobConfig);

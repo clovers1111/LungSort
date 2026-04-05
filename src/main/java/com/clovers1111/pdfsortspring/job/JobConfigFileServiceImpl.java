@@ -1,11 +1,13 @@
 package com.clovers1111.pdfsortspring.job;
 
-import com.clovers1111.pdfsortspring.Config;
 import com.clovers1111.pdfsortspring.file.FileTypes;
 import com.clovers1111.pdfsortspring.file.utility.FileRetrievalHelper;
 import com.clovers1111.pdfsortspring.job.utility.JobRetrievalHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,23 +17,22 @@ import java.util.UUID;
 @Service
 public class JobConfigFileServiceImpl implements JobConfigFileService {
 
-    private final JobConfigService jobConfigService;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    public JobConfigFileServiceImpl(JobConfigService jobConfigService){
-        this.jobConfigService = jobConfigService;
-    }
+
 
     // Job config folder has been created; we just need to persist the file as json
     public void saveJobConfigFile(JobConfig jobConfig) throws IOException {
         Files.write(jobConfig.getJobDir().resolve(jobConfig.getJobId() + FileTypes.JSON.getExtension()), jobConfigToJson(jobConfig).getBytes());
     }
 
-    public String jobConfigToJson(JobConfig jobConfig) {
-        return objectMapper.writeValueAsString(jobConfig);
+    public String jobConfigToJson(JobConfig jobConfig) throws JsonProcessingException {
+        // Module registration is necessary to deal with Instant object.
+        return objectMapper.registerModule(new JavaTimeModule()).writeValueAsString(jobConfig);
     }
 
     public Path buildJobConfigPath(Path rootDir, UUID jobId) {
-        return JobRetrievalHelper.getJobConfig(rootDir, jobId);
+        final Path jobConfigDir = rootDir.resolve(jobId.toString());
+        return JobRetrievalHelper.getJobConfigFile(jobConfigDir, jobId);
     }
 
     public FileTypes getJobConfigFileType(final JobConfig jobConfig) {

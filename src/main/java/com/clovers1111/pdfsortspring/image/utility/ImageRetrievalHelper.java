@@ -28,7 +28,7 @@ public class ImageRetrievalHelper extends FileRetrievalHelper {
         try (Stream<Path> paths = Files.list(directory)) {
             return paths
                     .filter(Files::isRegularFile)
-                    .filter(path -> isImageFile(path))
+                    .filter(ImageRetrievalHelper::isImageFile)
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);

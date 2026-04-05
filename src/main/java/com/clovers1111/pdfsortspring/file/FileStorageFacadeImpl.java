@@ -71,10 +71,11 @@ public class FileStorageFacadeImpl implements FileStorageFacade {
     public void savePdfAsImageFiles(final JobConfig jobConfig) throws IOException {
         final PDDocument pdDocument = pdfRendererService.fileToPdDocument(jobConfig.getJobConfigPrimaryFile());
         final Integer targetDpi = DEFAULT_DPI; // change later to incorporate job config resolution for dpi
-        final FileTypes type = jobConfigFileService.getJobConfigFileType(jobConfig);
+        // TODO: Let user select image type
+        final FileTypes typeOfImage = FileTypes.PNG; //jobConfigFileService.getJobConfigFileType(jobConfig);
 
         logger.debug("Delegating PDF to image files for job {} to {}", jobConfig.getJobId(), jobConfig.getJobDir());
-        pdfStorageService.savePdfAsImageFiles(pdDocument, targetDpi, jobConfig.getJobDir(), type);
+        pdfStorageService.savePdfAsImageFiles(pdDocument, targetDpi, jobConfig.getJobDir(), typeOfImage);
     }
 
     private void savePdfFile(MultipartFile file, JobConfig jobConfig) throws IOException {
