@@ -60,8 +60,7 @@ public class SortProcedureController {
      * @throws IOException if something explodes
      */
     @GetMapping(path = "/retrieve")
-    public ResponseEntity<byte[]> retrieveImageFile(@RequestParam("jobId") @NonNull final UUID jobId,
-                                                    @RequestBody @NonNull final Path imagePath) throws IOException {
+    public ResponseEntity<byte[]> retrieveImageFile(@RequestParam("jobId") @NonNull final UUID jobId,) throws IOException {
 
         return ResponseEntity.ok(ImageProcessorService.fileToByteArray(imagePath));
     }

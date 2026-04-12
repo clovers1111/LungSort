@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { JobConfig } from '../../../models/upload-response';
 import { EventEmitter, Output } from '@angular/core';
+import {JobStatus} from '../../../models/job-status';
 
 @Component({
   selector: 'app-job-card',
@@ -11,6 +12,9 @@ import { EventEmitter, Output } from '@angular/core';
 export class JobCard {
   @Input({ required: true }) job!: JobConfig;
 
-  @Output() jobClicked = new EventEmitter<string>();
-  
+  @Output() processJob = new EventEmitter<string>();
+
+  @Output() openImages = new EventEmitter<string>();
+
+  protected readonly JobStatus = JobStatus;
 }

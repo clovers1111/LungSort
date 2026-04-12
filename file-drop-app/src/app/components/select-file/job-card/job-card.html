@@ -1,7 +1,11 @@
 <div class="file-card">
     <div class="thumbnail">
-        <button class="select-btn" (click)="jobClicked.emit(job.jobId)">Process</button>
-    </div>
+      @if (job.status !== JobStatus.PROCESSED) {
+        <button class="select-btn" (click)="processJob.emit(job.jobId)">Process</button>
+      } @else {
+        <button class="open-btn" (click)="openImages.emit(job.jobId)">Open</button>
+    }
+      </div>
     <div class="file-info">
         <p class="job-id">{{ job.fileNameWithExtension }}</p>
         <p>{{ job.date }}</p>
