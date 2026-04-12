@@ -1,0 +1,40 @@
+<div class="img-popup-overlay" role="dialog" aria-modal="true" aria-label="Image viewer popup">
+  <div class="img-popup" (click)="$event.stopPropagation()">
+    <header class="img-popup-header">
+      <h3>Processed Images</h3>
+      <p>{{ imgPaths.length }} image(s)</p>
+      <button type="button" class="close-btn" aria-label="Close popup" (click)="close.emit()">Close</button>
+    </header>
+
+    @if (imgPaths.length > 0) {
+      <div class="img-viewer-row">
+        <button
+          type="button"
+          class="nav-arrow left-arrow"
+          aria-label="Previous image"
+          (click)="imageTrack.scrollBy({ left: -imageTrack.clientWidth, behavior: 'smooth' })">
+          &#8592;
+        </button>
+
+        <div class="img-track" #imageTrack>
+          @for (imgPath of imgPaths; track imgPath; let i = $index) {
+            <figure class="img-slide" [attr.data-index]="i">
+              <img [src]="imgPath" [alt]="'Image ' + (i + 1)" loading="lazy" />
+              <figcaption>{{ imgPath }}</figcaption>
+            </figure>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="nav-arrow right-arrow"
+          aria-label="Next image"
+          (click)="imageTrack.scrollBy({ left: imageTrack.clientWidth, behavior: 'smooth' })">
+          &#8594;
+        </button>
+      </div>
+    } @else {
+      <p>No images available for this job yet.</p>
+    }
+  </div>
+</div>
