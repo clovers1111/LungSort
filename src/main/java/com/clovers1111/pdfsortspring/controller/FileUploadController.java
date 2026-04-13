@@ -2,7 +2,7 @@ package com.clovers1111.pdfsortspring.controller;
 
 import com.clovers1111.pdfsortspring.Config;
 import com.clovers1111.pdfsortspring.file.FileOrchestratorService;
-import com.clovers1111.pdfsortspring.file.FilePathRetrievalService;
+import com.clovers1111.pdfsortspring.image.ImagePathService;
 import com.clovers1111.pdfsortspring.file.FileStorageFacade;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.job.JobConfigService;
@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,20 +28,22 @@ public class FileUploadController {
 
     private static final Integer NUMBER_OF_FILES = Config.getIntProperty("default-file-retrieval-number");
 
+    private static final String IMAGES_PATH = Config.getProperty("mvc-images-path");
+
     private final FileStorageFacade fileStorageFacade;
     private final JobConfigService jobConfigService;
     private final FileOrchestratorService fileOrchestratorService;
-    private final FilePathRetrievalService filePathRetrievalService;
+    private final ImagePathService imagePathService;
 
     public FileUploadController(
             FileStorageFacade fileStorageFacade,
             JobConfigService jobConfigService,
             FileOrchestratorService fileOrchestratorService,
-            FilePathRetrievalService filePathRetrievalService) {
+            ImagePathService imagePathService) {
         this.fileStorageFacade = fileStorageFacade;
         this.jobConfigService = jobConfigService;
         this.fileOrchestratorService = fileOrchestratorService;
-        this.filePathRetrievalService = filePathRetrievalService;
+        this.imagePathService = imagePathService;
     }
 
     /**
@@ -61,10 +64,6 @@ public class FileUploadController {
         final JobConfig jobConfig = jobConfigService.createJobConfig(file);
         fileStorageFacade.saveMultipartFile(file, jobConfig);
         logger.info("File uploaded successfully: jobId={}, file={}", jobConfig.getJobId(), jobConfig.getFileNameWithExtension());
-
-
-        // Pulls out the file with the path (e.g., /job-directories/jobUUID/jobUUID.json)
-        final Path storedFile = jobConfig.getJobDir().resolve(jobConfig.getFileNameWithExtension());
         return ResponseEntity.ok(jobConfig);
     }
 
@@ -82,9 +81,12 @@ public class FileUploadController {
         logger.info("Successfully persisted job {}", jobConfig.getJobId());
 
         // Get image files for user to request later; we'll do this now to make frontend retrieval more seamless.
-        final Set<Path> imageFilePaths = filePathRetrievalService.retrieveImageFiles(jobConfig, NUMBER_OF_FILES);
+        final Set<Path> imageFilePaths = imagePathService.retrieveImageFiles(jobConfig, NUMBER_OF_FILES);
+        final Set<String> imageUrls = imageFilePaths.stream()
+                .map(path ->  IMAGES_PATH + jobConfig.getJobId() + "/" + path.getFileName())
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
 
-        final ImageProcessResponseDto response = new ImageProcessResponseDto(imageFilePaths, jobConfig.getJobId());
+        final ImageProcessResponseDto response = new ImageProcessResponseDto(imageUrls, jobConfig.getJobId());
 
         return ResponseEntity.ok(response);
     }

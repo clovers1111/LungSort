@@ -1,6 +1,5 @@
-package com.clovers1111.pdfsortspring.file;
+package com.clovers1111.pdfsortspring.image;
 
-import com.clovers1111.pdfsortspring.file.utility.FileRetrievalHelper;
 import com.clovers1111.pdfsortspring.image.utility.ImageRetrievalHelper;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import org.slf4j.Logger;
@@ -11,17 +10,17 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
-public class FilePathRetrievalServiceImpl implements FilePathRetrievalService {
+public class ImagePathServiceImpl implements ImagePathService {
 
-    final static Logger logger = LoggerFactory.getLogger(FilePathRetrievalServiceImpl.class);
+    final static Logger logger = LoggerFactory.getLogger(ImagePathServiceImpl.class);
 
-    // Keep track of the job config and corresponding paths of image files
+    // Keep track of the job config and corresponding absolute paths of image files
     private final static Map<JobConfig, Stack<Path>> cache = new ConcurrentHashMap<>();
 
     @Override
+    // Retrieves image files with the absolute path of the JobConfig directory appended.
     public Set<Path> retrieveImageFiles(final JobConfig jobConfig, final Integer numOfFiles) {
         if (jobConfig == null) {
             logger.warn("JobConfig {} is null and cannot retrieve image files", jobConfig.getJobId());

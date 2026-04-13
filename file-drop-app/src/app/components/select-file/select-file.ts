@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {ProcessFacade} from '../../services/facade/process-facade/process-facade';
 import {JobConfig} from '../../models/upload-response';
 import {JobCard} from './job-card/job-card';
@@ -16,26 +16,30 @@ import {ImgSelect} from './img-select/img-select';
 })
 export class SelectFile {
 
-  protected jobs: JobConfig[]
+  protected jobs = signal<JobConfig[]>([]);
 
-  protected isImgSelect: boolean = false;
+  protected isImgSelect = signal(false);
 
-  protected currentImgPaths: string[] = [];
+  protected currentImgPaths = signal<string[]>([]);
 
   // Cache for processed image paths by jobId
   protected imagePathsByJobId: Record<string, string[]> = {};
 
   constructor(private processFacade: ProcessFacade, private fileFacade: FileFacade) {
-    this.jobs = fileFacade.getJobConfigs();
+    this.jobs.set(fileFacade.getJobConfigs());
   }
 
   onJobClicked(jobId: string) {
+    if (this.getJobById(jobId)?.status === JobStatus.PROCESSING) {
+      return; // Prevent re-processing if already in progress
+    }
+    this.setJobStatus(jobId, JobStatus.PROCESSING);
     this.processFacade.processFile(jobId).subscribe({
       // process files in next
       next: (event) =>  {
         if (event.type === HttpEventType.Response && event.body) {
           const imgDto: ImageProcessDto = event.body;
-          this.setJobImgPaths(jobId, imgDto.imagePaths)
+          this.setJobImgPaths(jobId, imgDto.imagePaths);
           this.setJobStatus(jobId, JobStatus.PROCESSED);
         }
         },
@@ -44,13 +48,13 @@ export class SelectFile {
   }
 
   onOpenImages(jobId: string) {
-    this.currentImgPaths = this.imagePathsByJobId[jobId] || [];
-    this.isImgSelect = true;
+    this.currentImgPaths.set(this.imagePathsByJobId[jobId] || []);
+    this.isImgSelect.set(true);
   }
 
   onCloseImages() {
-    this.isImgSelect = false;
-    this.currentImgPaths = [];
+    this.isImgSelect.set(false);
+    this.currentImgPaths.set([]);
   }
 
   private setJobImgPaths(jobId: string, imgPaths: string[]) {
@@ -58,19 +62,20 @@ export class SelectFile {
       ...this.imagePathsByJobId,
       [jobId]: imgPaths
     };
-    // Emit event containing the imgPaths to the correct jobId.
-
   }
 
-
   private setJobStatus(jobId: string, status: JobStatus) {
-    this.jobs = this.jobs.map(job =>
-      job.jobId === jobId ? {...job, status} : job);
+    this.jobs.update(jobs => jobs.map(job =>
+      job.jobId === jobId ? {...job, status} : job));
+  }
+
+  private getJobById(jobId: string): JobConfig | undefined {
+    return this.jobs().find(job => job.jobId === jobId);
   }
 
   clearJobs() {
     this.fileFacade.clearJobConfigs();
-    this.jobs = [];
+    this.jobs.set([]);
   }
 
 }

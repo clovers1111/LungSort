@@ -8,7 +8,12 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ImgSelect {
 
+  boolean
+
   @Input() imgPaths: string[] = [];
 
   @Output() close = new EventEmitter<void>();
+
+  @Output() selection = new EventEmitter<string>();
+
 }

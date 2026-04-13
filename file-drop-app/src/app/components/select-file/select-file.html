@@ -1,6 +1,6 @@
 <main>
     <div class="file-container">
-        @for (job of jobs; track job.jobId) {
+        @for (job of jobs(); track job.jobId) {
             <app-job-card [job]="job"
                           (processJob)="onJobClicked($event)"
                           (openImages)="onOpenImages($event)"
@@ -10,8 +10,8 @@
         }
     </div>
 
-    @if (isImgSelect) {
-        <app-img-select [imgPaths]="currentImgPaths"
+    @if (isImgSelect()) {
+        <app-img-select [imgPaths]="currentImgPaths()"
                         (close)="onCloseImages()" />
     }
 

@@ -1,0 +1,134 @@
+/* Full-screen backdrop */
+.img-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Panel that spans the full viewport width */
+.img-popup {
+  position: relative;
+  width: 100vw;
+  max-height: 90vh;
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header bar */
+.img-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: #111;
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+}
+
+.img-popup-header h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.img-popup-header p {
+  margin: 0;
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.close-btn {
+  margin-left: auto;
+  padding: 0.3rem 0.9rem;
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.close-btn:hover {
+  background: #e74c3c;
+}
+
+/* Row: left-arrow | scrollable track | right-arrow */
+.img-viewer-row {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  overflow: hidden;
+  padding: 0.5rem 0;
+}
+
+/* Horizontally scrollable image strip */
+.img-track {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex: 1;
+  padding: 0.5rem 1rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: #555 #1a1a1a;
+}
+
+.img-slide {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.img-slide img {
+  height: 65vh;
+  width: auto;
+  max-width: 80vw;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid #444;
+}
+
+.img-slide figcaption {
+  color: #888;
+  font-size: 0.7rem;
+  max-width: 20rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Navigation arrows */
+.nav-arrow {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.5rem;
+  transition: background 0.2s;
+}
+
+.nav-arrow:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+

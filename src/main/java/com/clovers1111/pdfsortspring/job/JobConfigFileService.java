@@ -17,4 +17,5 @@ public interface JobConfigFileService {
     public FileTypes getJobConfigFileType(final JobConfig jobConfig);
 
     Path buildJobConfigPath(Path path, UUID jobId);
+
 }
