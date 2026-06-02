@@ -1,6 +1,6 @@
 package com.clovers1111.pdfsortspring.image;
 
-import com.clovers1111.pdfsortspring.Config;
+import com.clovers1111.pdfsortspring.config.AppFileProperties;
 import com.clovers1111.pdfsortspring.pdf.PdfRendererService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -36,13 +36,15 @@ public class ImageEvaluationServiceImpl implements ImageEvaluationService {
 
     private final int SAMPLE_HEIGHT = 100;
 
-    private final List<Integer> dpis = Config.getIntListProperty("config.dpi-list", ",");
+    private final List<Integer> dpis;
 
 
     public ImageEvaluationServiceImpl(ImageEditingService imageEditingService,
-                                      PdfRendererService pdfRendererService) {
+                                      PdfRendererService pdfRendererService,
+                                      AppFileProperties appFileProperties) {
         this.imageEditingService = imageEditingService;
         this.pdfRendererService = pdfRendererService;
+        this.dpis = List.copyOf(appFileProperties.dpiList());
     }
 
     //TODO: fix margin of error to be more standardized

@@ -1,8 +1,9 @@
 package com.clovers1111.pdfsortspring.controller;
 
-import com.clovers1111.pdfsortspring.Config;
+import com.clovers1111.pdfsortspring.config.AppFileProperties;
 import com.clovers1111.pdfsortspring.file.FileOrchestratorService;
 import com.clovers1111.pdfsortspring.image.ImagePathService;
+import com.clovers1111.pdfsortspring.image.utility.ImagePathToUrlMapper;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.job.JobConfigService;
 import lombok.NonNull;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,15 +28,15 @@ public class JobOperationController {
 
     public static Logger logger = LoggerFactory.getLogger(JobOperationController.class);
 
-    private static final Integer NUMBER_OF_FILES = Config.getIntProperty("default-file-retrieval-number");
-
-    private static final String IMAGES_PATH = Config.getProperty("mvc-images-path");
-
     private final FileOrchestratorService fileOrchestratorService;
 
     private final ImagePathService imagePathService;
 
     private final JobConfigService jobConfigService;
+
+    private final AppFileProperties appFileProperties;
+
+    private final ImagePathToUrlMapper imagePathToUrlMapper;
 
 
 
@@ -54,10 +54,10 @@ public class JobOperationController {
         logger.info("Successfully persisted job {}", jobConfig.getJobId());
 
         // Get image files for user to request later; we'll do this now to make frontend retrieval more seamless.
-        final Set<Path> imageFilePaths = imagePathService.retrieveImageFiles(jobConfig, NUMBER_OF_FILES);
-        final Set<String> imageUrls = imageFilePaths.stream()
-                .map(path ->  IMAGES_PATH + jobConfig.getJobId() + "/" + path.getFileName())
-                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+        final Set<Path> imageFilePaths = imagePathService.retrieveImageFiles(
+                jobConfig,
+                appFileProperties.defaultFileRetrievalNumber());
+        final Set<String> imageUrls = imagePathToUrlMapper.imagePathToUrl(imageFilePaths, jobConfig);
 
         final ImageProcessResponseDto response = new ImageProcessResponseDto(imageUrls, jobConfig.getJobId());
 

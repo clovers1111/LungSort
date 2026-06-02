@@ -1,6 +1,6 @@
 package com.clovers1111.pdfsortspring.pdf;
 
-import com.clovers1111.pdfsortspring.Config;
+import com.clovers1111.pdfsortspring.config.AppFileProperties;
 import com.clovers1111.pdfsortspring.file.FileTypes;
 import com.clovers1111.pdfsortspring.file.StorageFacade;
 import com.clovers1111.pdfsortspring.job.JobConfig;
@@ -24,17 +24,18 @@ public class PdfStorageServiceFacade implements StorageFacade {
 
     private final PdfStorageService pdfStorageService;
 
-    private static final int DEFAULT_DPI = Config.getIntProperty("default-dpi");
+    private final AppFileProperties appFileProperties;
 
     @Override
     public void processIntoImageFiles(final JobConfig jobConfig) throws IOException {
-        final PDDocument pdDocument = pdfRendererService.fileToPdDocument(jobConfig.getJobConfigDocumentFile());
-        final Integer targetDpi = DEFAULT_DPI; // change later to incorporate job config resolution for dpi
-        // TODO: Let user select image type
-        final FileTypes typeOfImage = FileTypes.PNG; //jobConfigFileService.getJobConfigFileType(jobConfig);
+        try (PDDocument pdDocument = pdfRendererService.fileToPdDocument(jobConfig.getJobConfigDocumentFile())) {
+            final Integer targetDpi = appFileProperties.defaultDpi(); // change later to incorporate job config resolution for dpi
+            // TODO: Let user select image type
+            final FileTypes typeOfImage = FileTypes.PNG; //jobConfigFileService.getJobConfigFileType(jobConfig);
 
-        logger.debug("Delegating PDF to image files for job {} to {}", jobConfig.getJobId(), jobConfig.getJobDir());
-        pdfStorageService.savePdfAsImageFiles(pdDocument, targetDpi, jobConfig.getJobDir(), typeOfImage);
+            logger.debug("Delegating PDF to image files for job {} to {}", jobConfig.getJobId(), jobConfig.getJobDir());
+            pdfStorageService.savePdfAsImageFiles(pdDocument, targetDpi, jobConfig.getJobDir(), typeOfImage);
+        }
     }
 
     @Override

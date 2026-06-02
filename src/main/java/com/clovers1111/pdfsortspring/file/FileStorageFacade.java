@@ -1,6 +1,5 @@
 package com.clovers1111.pdfsortspring.file;
 
-import com.clovers1111.pdfsortspring.Config;
 import com.clovers1111.pdfsortspring.job.JobConfig;
 import com.clovers1111.pdfsortspring.pdf.PdfStorageService;
 import org.slf4j.Logger;

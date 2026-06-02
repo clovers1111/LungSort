@@ -1,19 +1,24 @@
 package com.clovers1111.pdfsortspring.image.utility;
 
-import com.clovers1111.pdfsortspring.Config;
+import com.clovers1111.pdfsortspring.config.AppWebProperties;
 import com.clovers1111.pdfsortspring.job.JobConfig;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@Component
+@RequiredArgsConstructor
 public class ImagePathToUrlMapper {
-    private final static String MVC_IMAGES_PATH = Config.getProperty("mvc-images-path");
+
+    private final AppWebProperties appWebProperties;
 
 
-    public static Set<String> imagePathToUrl(Set<Path> imageFilePaths, JobConfig jobConfig) {
+    public Set<String> imagePathToUrl(Set<Path> imageFilePaths, JobConfig jobConfig) {
         return imageFilePaths.stream()
-                .map(path ->  MVC_IMAGES_PATH + jobConfig.getJobId() + "/" + path.getFileName())
+                .map(path -> appWebProperties.mvcImages() + jobConfig.getJobId() + "/" + path.getFileName())
                 .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
 
     }

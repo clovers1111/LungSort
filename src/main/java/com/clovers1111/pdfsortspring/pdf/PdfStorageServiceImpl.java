@@ -1,7 +1,8 @@
 package com.clovers1111.pdfsortspring.pdf;
 
-import com.clovers1111.pdfsortspring.Config;
+import com.clovers1111.pdfsortspring.config.AppFileProperties;
 import com.clovers1111.pdfsortspring.file.FileTypes;
+import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,20 +14,17 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
+@RequiredArgsConstructor
 public class PdfStorageServiceImpl implements PdfStorageService {
 
     private static final Logger logger = LoggerFactory.getLogger(PdfStorageServiceImpl.class);
-    private static final String IMAGE_PREFIX = Config.getProperty("image-prefix");
 
     //TODO: Figure out if you should make static or just refactor this class into the respective domains
     private final PdfRendererService pdfRendererService;
 
-    public PdfStorageServiceImpl(PdfRendererService pdfRendererService) {
-        this.pdfRendererService = pdfRendererService;
-    }
+    private final AppFileProperties appFileProperties;
 
     @Override
     public void savePdfFile(final MultipartFile file, final Path targetPathWithFile) throws IOException {
@@ -58,8 +56,8 @@ public class PdfStorageServiceImpl implements PdfStorageService {
         }
     }
 
-    public static String seqFileNameGenerator(int sequenceNum, FileTypes fileType) {
-        return IMAGE_PREFIX + sequenceNum + fileType.getExtension();
+    public String seqFileNameGenerator(int sequenceNum, FileTypes fileType) {
+        return appFileProperties.imagePrefix() + sequenceNum + fileType.getExtension();
     }
 }
 

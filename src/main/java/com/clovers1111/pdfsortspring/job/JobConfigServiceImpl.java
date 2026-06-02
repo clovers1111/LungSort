@@ -1,6 +1,6 @@
 package com.clovers1111.pdfsortspring.job;
 
-import com.clovers1111.pdfsortspring.Config;
+import com.clovers1111.pdfsortspring.config.AppFileProperties;
 import com.clovers1111.pdfsortspring.file.utility.DirectoryHelper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -25,8 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JobConfigServiceImpl implements JobConfigService {
 
     private static final Logger logger = LoggerFactory.getLogger(JobConfigServiceImpl.class);
-    private static final Path ROOT_DIR = Config.getDirectory();
+
     private static final String DEFAULT_FILE_NAME = "upload.bin";
+
+    private final AppFileProperties appFileProperties;
 
     private final JobConfigFileService jobConfigFileService;
 
@@ -49,7 +50,8 @@ public class JobConfigServiceImpl implements JobConfigService {
          * person being hit by a meteorite over the course of a year.
          */
         final UUID jobId = UUID.randomUUID();
-        final Path jobDir = ROOT_DIR.resolve(jobId.toString());
+        final Path rootDir = appFileProperties.saveDirectory();
+        final Path jobDir = rootDir.resolve(jobId.toString());
 
         final String fileNameWithExtension = validateFileName(multipartFile.getOriginalFilename());
         final JobConfig jobConfig = new JobConfig(jobId, fileNameWithExtension, jobDir);
@@ -71,7 +73,8 @@ public class JobConfigServiceImpl implements JobConfigService {
         // TODO: Missing instance where jobConfig is null
         if (!jobConfigsCache.containsKey(jobId)) { // try to find jobConfig
             logger.warn("JobConfig {} wasn't found in cache. Attempting to resolve . . .", jobId);
-            final Path jobConfigPath = jobConfigFileService.buildJobConfigPath(ROOT_DIR, jobId);
+            final Path rootDir = appFileProperties.saveDirectory();
+            final Path jobConfigPath = jobConfigFileService.buildJobConfigPath(rootDir, jobId);
             // jobConfigPath shouldn't ever be null since we pass the root directory in.
             if (jobConfigPath == null || !jobConfigPath.toFile().exists()) {
                 throw new NoSuchElementException("No JobConfig found for jobId: " + jobId);
