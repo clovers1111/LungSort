@@ -11,6 +11,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Map;
@@ -51,8 +52,11 @@ public class JobConfigServiceImpl implements JobConfigService {
          */
         final UUID jobId = UUID.randomUUID();
         final Path rootDir = appFileProperties.saveDirectory();
+        if (!Files.exists(rootDir)) {
+            throw new IOException(String.format("Directory %s does not exist. " +
+                    "Please set an actual directory in application.properties.", rootDir));
+        }
         final Path jobDir = rootDir.resolve(jobId.toString());
-
         final String fileNameWithExtension = validateFileName(multipartFile.getOriginalFilename());
         final JobConfig jobConfig = new JobConfig(jobId, fileNameWithExtension, jobDir);
 
@@ -60,7 +64,6 @@ public class JobConfigServiceImpl implements JobConfigService {
         jobConfigFileService.saveJobConfigFile(jobConfig);
 
         jobConfigsCache.put(jobId, jobConfig);
-
 
         logger.info("Created job config: jobId={}, jobDir={}, fileName={}", jobId, jobDir, fileNameWithExtension);
         return jobConfig;
