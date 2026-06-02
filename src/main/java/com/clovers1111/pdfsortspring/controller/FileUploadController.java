@@ -46,24 +46,4 @@ public class FileUploadController {
         logger.info("File uploaded successfully: jobId={}, file={}", jobConfig.getJobId(), jobConfig.getFileNameWithExtension());
         return ResponseEntity.ok(jobConfig);
     }
-
-    /*
-    //TODO: Refactor to worth with paths
-    @GetMapping(path = "/retrieve")
-    public ResponseEntity<byte[]> retrieveThumbnail() throws IOException {
-        logger.debug("Thumbnail retrieval request received");
-
-        final Path imgFile = fileStorageFacade.getRandomImageFile();
-        logger.debug("Selected image file for thumbnail: {}", imgFile.getName());
-
-        final byte[] body = fileConversionService.fileToByteArray(imgFile);
-        final String contentType = FileStorageFacade.getContentType(imgFile);
-        logger.info("Returning thumbnail: file={}, contentType={}, size={} bytes",
-                imgFile.getName(), contentType, body.length);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(contentType))
-                .body(body);
-    }
-    */
 }
