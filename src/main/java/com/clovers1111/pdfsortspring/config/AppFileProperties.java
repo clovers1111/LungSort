@@ -2,6 +2,7 @@ package com.clovers1111.pdfsortspring.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +24,21 @@ public record AppFileProperties(
         Objects.requireNonNull(saveDirectory, "app.file.save-directory must be configured");
         Objects.requireNonNull(defaultDpi, "app.file.default-dpi must be configured");
         Objects.requireNonNull(defaultFileRetrievalNumber, "app.file.default-file-retrieval-number must be configured");
+
+        if (!Files.isDirectory(saveDirectory)) {
+            throw new IllegalArgumentException(
+                    "app.file.save-directory must be a directory: " + saveDirectory);
+        }
+        if (!Files.isWritable(saveDirectory)) {
+            throw new IllegalArgumentException(
+                    "app.file.save-directory must be a writable directory: " + saveDirectory);
+
+        }
+
+        if (!Files.isReadable(saveDirectory)) {
+            throw new IllegalArgumentException(
+                    "app.file.save-directory must be a readable directory: " + saveDirectory);
+        }
 
         if (defaultDpi <= 0) {
             throw new IllegalArgumentException("app.file.default-dpi must be greater than 0");
