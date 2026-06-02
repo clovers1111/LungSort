@@ -37,8 +37,15 @@ public enum FileTypes {
     }
 
     public static Optional<FileTypes> fromExtension(String extension) {
+        if (extension == null || extension.isBlank()) {
+            return Optional.empty();
+        }
+        final String validatedExtension = extension.charAt(0) != '.'
+                ? "." + extension
+                : extension;
+
         return Arrays.stream(values())
-                .filter(fileType -> fileType.extension.equalsIgnoreCase(extension))
+                .filter(fileType -> fileType.extension.equalsIgnoreCase(validatedExtension))
                 .findFirst();
     }
 

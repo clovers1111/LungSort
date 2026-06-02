@@ -16,14 +16,30 @@
           &#8592;
         </button>
 
-        <div class="img-track" #imageTrack>
-          @for (imgPath of imgPaths; track imgPath; let i = $index) {
-            <figure class="img-slide" [attr.data-index]="i">
-              <img [src]="imgPath" [alt]="'Image ' + (i + 1)" loading="lazy" />
-              <figcaption>{{ imgPath }}</figcaption>
-            </figure>
-          }
-        </div>
+      <div class="img-track" #imageTrack>
+        @for (imgPath of imgPaths; track imgPath; let i = $index) {
+          <figure class="img-slide" [attr.data-index]="i">
+            <div class="img-frame">
+              <img
+                #pageImage
+                class="page-image"
+                [src]="imgPath"
+                [alt]="'Image ' + (i + 1)"
+                loading="lazy"
+                (load)="onImageLoad(pageImage, selectionCanvas)"
+              />
+
+              <canvas
+                #selectionCanvas
+                class="selection-canvas">
+                (pointerdown)="onPointerDown($event,
+              </canvas>
+            </div>
+
+            <figcaption>{{ imgPath }}</figcaption>
+          </figure>
+        }
+      </div>
 
         <button
           type="button"

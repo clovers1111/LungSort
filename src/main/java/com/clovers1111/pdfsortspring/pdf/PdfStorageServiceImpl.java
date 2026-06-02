@@ -42,19 +42,24 @@ public class PdfStorageServiceImpl implements PdfStorageService {
         final List<BufferedImage> bimList = pdfRendererService.pdDocumentToBimList(pdDocument, dpi);
         logger.info("Rendering {} pages at {} DPI to {}", bimList.size(), dpi, outputDir);
 
-        IntStream.range(0, bimList.size())
-                .forEach(i -> { // Needs to be a sequential naming scheme
-                    final Path output = outputDir.resolve(IMAGE_PREFIX + i + type.getExtension());
-                    try {
-                        final boolean write = ImageIO.write(bimList.get(i), FileTypes.PNG.getExtensionWithoutDot(), output.toFile());
-                        if (!write)
-                            logger.error("Failed to write page {} to {}", i, output);
-                        logger.debug("Wrote page {} to {}", i, output);
-                    } catch (IOException e) {
-                        logger.error("Failed to write page {} to {}", i, output, e);
-                        throw new RuntimeException(e);
-                    }
-                });
+
+        for (int i = 0; i < bimList.size(); i++) {
+            final String fileName = seqFileNameGenerator(i, type);
+            final Path output = outputDir.resolve(fileName);
+
+            try {
+                ImageIO.write(bimList.get(i), FileTypes.PNG.getExtensionWithoutDot(), output.toFile());
+                logger.debug("Wrote page {} to {}", i, output);
+            } catch (IOException e) {
+                logger.error("Failed to write page {} to {}", i, output, e);
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+
+    public static String seqFileNameGenerator(int sequenceNum, FileTypes fileType) {
+        return IMAGE_PREFIX + sequenceNum + fileType.getExtension();
     }
 }
 

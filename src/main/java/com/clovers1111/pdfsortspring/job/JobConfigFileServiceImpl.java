@@ -22,7 +22,7 @@ public class JobConfigFileServiceImpl implements JobConfigFileService {
 
     // Job config folder has been created; we just need to persist the file as json
     public void saveJobConfigFile(JobConfig jobConfig) throws IOException {
-        Files.write(jobConfig.getJobDir().resolve(jobConfig.getJobId() + FileTypes.JSON.getExtension()), jobConfigToJson(jobConfig).getBytes());
+        Files.write(jobConfigFilePath(jobConfig), jobConfigToJson(jobConfig).getBytes());
     }
 
     public String jobConfigToJson(JobConfig jobConfig) throws JsonProcessingException {
@@ -39,7 +39,13 @@ public class JobConfigFileServiceImpl implements JobConfigFileService {
         return FileTypes.fromExtension(FileRetrievalHelper
                         .getFileExtension(Path.of(jobConfig
                                 .getFileNameWithExtension())))
-                .orElseThrow(/*some exception*/);
+                .orElseThrow();
     }
+
+    public static Path jobConfigFilePath(JobConfig jobConfig) {
+        return jobConfig.getJobDir().resolve(jobConfig.getJobId() + FileTypes.JSON.getExtension());
+    }
+
+
 
 }

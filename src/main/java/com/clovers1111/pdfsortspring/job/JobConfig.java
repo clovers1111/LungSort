@@ -30,7 +30,7 @@ public class JobConfig {
     }
 
     // E.g., /root/dir/my-file.pdf
-    public Path getJobConfigPrimaryFile() {
+    public Path getJobConfigDocumentFile() {
         return getJobDir().resolve(getFileNameWithExtension());
     }
 

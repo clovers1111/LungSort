@@ -1,6 +1,7 @@
 package com.clovers1111.pdfsortspring.job;
 
 import com.clovers1111.pdfsortspring.Config;
+import com.clovers1111.pdfsortspring.file.utility.DirectoryHelper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,10 @@ public class JobConfigServiceImpl implements JobConfigService {
 
         final String fileNameWithExtension = validateFileName(multipartFile.getOriginalFilename());
         final JobConfig jobConfig = new JobConfig(jobId, fileNameWithExtension, jobDir);
+
+        DirectoryHelper.createDirectory(jobConfig.getJobDir());
+        jobConfigFileService.saveJobConfigFile(jobConfig);
+
         jobConfigsCache.put(jobId, jobConfig);
 
 
@@ -74,16 +79,21 @@ public class JobConfigServiceImpl implements JobConfigService {
                 throw new IOException("Cannot read" + jobConfigPath);
             }
 
-            try {
-                jobConfigsCache.put(jobId,
-                        objectMapper.readValue(jobConfigPath, JobConfig.class));
-            } catch (JacksonException e) {
-                throw new RuntimeException(e);
-            }
+            cacheJobConfig(jobId, jobConfigPath);
+
         }
 
         final JobConfig jobConfig = jobConfigsCache.get(jobId);
         return jobConfig;
+    }
+
+    private void cacheJobConfig(UUID jobId, Path jobConfigPath) {
+        try {
+            jobConfigsCache.put(jobId,
+                    objectMapper.readValue(jobConfigPath, JobConfig.class));
+        } catch (JacksonException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String validateFileName(final String originalFileName) {
